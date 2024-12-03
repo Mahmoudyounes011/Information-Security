@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('user_name')->unique();
             $table->string('password');
-            $table->double('balance')->nullable();
+            $table->text('balance');
             $table->rememberToken();
             $table->timestamps();
         });

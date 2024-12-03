@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Crypt;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -22,7 +23,8 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'user_name',
-        'password','balance'
+        'password',
+        'balance',
     ];
 
     /**
@@ -46,5 +48,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public static function setBalanceAttribute($value)
+    {
+        return Crypt::encryptString($value);
+    }
+
+    public static function getBalanceAttribute($value)
+    {
+        return Crypt::decryptString($value);
     }
 }

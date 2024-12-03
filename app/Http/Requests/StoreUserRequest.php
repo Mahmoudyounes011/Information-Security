@@ -20,6 +20,8 @@ class StoreUserRequest extends FormRequest
             'last_name' => 'required|string|max:15',
             'user_name' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
+            'balance' => 'required',
+
             //'device_token'=>'required|string|max:255',
             // 'phone_number' => [
             //     'required',
