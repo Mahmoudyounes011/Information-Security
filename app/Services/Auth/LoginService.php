@@ -22,7 +22,7 @@ class LoginService
             {
                 throw new Exception(__('user.logIN_error'));
             }
-            $user = $this->userService->findUserByEmail($request->email);
+            $user = $this->userService->findByUserName($request->user_name);
             unset($user->role);
             return [
                 'user' => $user,

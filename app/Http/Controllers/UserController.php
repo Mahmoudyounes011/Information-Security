@@ -87,6 +87,7 @@ class UserController extends Controller
 
     public function getBalance()
 {
+
     $user = Auth::user();
 
     $currentBalance = Crypt::decryptString($user->balance);

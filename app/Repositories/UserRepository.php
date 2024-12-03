@@ -12,9 +12,9 @@ class UserRepository extends BaseRepository
         parent::__construct($model);
     }
 
-    public function findByEmail(string $email)
+    public function findByUserName(string $user_name)
     {
-        return $this->model->where('email', $email)->first();
+        return $this->model->where('user_name', $user_name)->first();
     }
 
     public function getGroupsByUser($userId)

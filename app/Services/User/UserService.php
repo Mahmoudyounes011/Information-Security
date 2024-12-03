@@ -20,9 +20,9 @@ class UserService extends BaseService{
         $this->userRepository = $userRepository;
     }
 
-    public  function findUserByEmail(string $email)
+    public  function findByUserName(string $user_name)
     {
-        return $this->userRepository->findByEmail($email);
+        return $this->userRepository->findByUserName($user_name);
     }
 
     public  function createUser(StoreUserRequest $request)
@@ -49,55 +49,9 @@ class UserService extends BaseService{
         }
     }
 
-    public function getGroupsByUser($userId)
-    {
-        return $this->userRepository->getGroupsByUser($userId);
-    }
+  
 
-    public function getUserInvitations($userId)
-    {
-        return $this->userRepository->getUserInvitations($userId);
-    }
-
-    public function searchByName( $value)
-    {
-        return $this->userRepository->searchByName($value);
-    }
-
-    public function updateUserImage($userId, $imageFile)
-    {
-        $user = $this->userRepository->find($userId);
-        if (!$user) {
-            throw new \Exception("User not found.");
-        }
-    
-        if ($user->image && Storage::disk('public')->exists($user->image)) {
-            Storage::disk('public')->delete($user->image);
-        }
-    
-        $imagePath = $this->uploadImage($imageFile, 'users');
-        if (!$imagePath) {
-            throw new \Exception("Failed to upload image.");
-        }
-    
-        return $this->userRepository->updateImage($userId, $imagePath);
-    }
-
-    public function removeUserImage($userId)
-    {
-        return $this->userRepository->deleteImage($userId);
-    }
-
-    private function uploadImage($imageFile, $folder)
-    {
-        $fileName = uniqid() . '_' . $imageFile->getClientOriginalName();
-        return $imageFile->storeAs($folder, $fileName, 'public');
-    }
-
-    public function allUsers()
-    {
-        return $this->userRepository->all();
-    }
+   
 
 
 
