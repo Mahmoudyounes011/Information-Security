@@ -6,9 +6,11 @@ use App\Http\Requests\BalanceRequest;
 use App\Http\Requests\ImageRequest;
 use App\Http\Requests\SearchReqesut;
 use App\Http\Resources\GroupResource;
+use App\Models\User;
 use App\Services\User\UserService;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
@@ -16,39 +18,67 @@ use Illuminate\Support\Facades\Crypt;
 class UserController extends Controller
 {
     use ApiResponse;
-   
+
     public function deposit(BalanceRequest $balanceRequest)
-{
-        // get private key for decrypt 
-        $privateKey = env('PRIVATE_KEY');
+    {
+        try {
 
-        $rsa = RSA::loadPrivateKey($privateKey);
+            $amount = $balanceRequest->input('amount');
+    
+            
+            if (!is_numeric($amount) || $amount <= 0) {
+                return response()->json(['message' => 'Invalid amount'], 400);
+            }
+    
+            $publicKeyPath = storage_path('keys/public_key.pem');
+            $publicKey = file_get_contents($publicKeyPath);
+            if (!$publicKey) {
+                throw new Exception('Missing public key');
+            }
+    
+            
+            $rsaPublic = RSA::loadPublicKey($publicKey);
+    
+            $encryptedAmount = base64_encode($rsaPublic->encrypt($amount));
+    
+            
+            $userId = Auth::user()->id;
+    
+            $user = User::find($userId);
+    
+            
+            $Balance = $user->balance;
 
-        
-        //decrypt the data 
-        $encryptedAmount = $balanceRequest->input('amount'); 
-        $amount = $rsa->decrypt(base64_decode($encryptedAmount));
-
-        //dd($amount);
-        
-        if (!is_numeric($amount) || $amount <= 0) {
-            return response()->json(['message' => 'Invalid amount'], 400);
+    
+            $privateKey = env('PRIVATE_KEY');
+            $rsaPrivate = RSA::loadPrivateKey($privateKey);
+            $decryptedAmount = $rsaPrivate->decrypt(base64_decode($encryptedAmount));
+    
+            if ($amount != $decryptedAmount) {
+                throw new Exception('Decryption mismatch');
+            }
+    
+            
+            $newBalance = $currentBalance + $decryptedAmount;
+    
+            $user->balance = Crypt::encryptString($newBalance);
+            $user->save();
+    
+            $clientPublicKeyPath = storage_path('keys/client_public_key.pem');
+            $clientPublicKey = file_get_contents($clientPublicKeyPath);
+            if (!$clientPublicKey) {
+                throw new Exception('Missing client public key');
+            }
+    
+            $rsaClient = RSA::loadPublicKey($clientPublicKey);
+            $encryptedResponse = base64_encode($rsaClient->encrypt($newBalance));
+    
+            return response()->json(['encrypted_balance' => $encryptedResponse], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        $user = Auth::user();
-        $currentBalance = Crypt::decryptString($user->balance); 
-        $newBalance = $currentBalance + $amount; 
-
-        $user->balance = Crypt::encryptString($newBalance);
-        $user->save();
-
-        //encrypt response in public key for a user 
-        $clientPublicKey = file_get_contents(storage_path('keys/client_public_key.pem')); 
-        $rsaClient = RSA::loadPublicKey($clientPublicKey);
-        $encryptedResponse = base64_encode($rsaClient->encrypt($newBalance));
-
-        return response()->json(['encrypted_balance' => $encryptedResponse], 200);
     }
+    
 
 
     public function withdraw(Request $request)
@@ -92,7 +122,7 @@ class UserController extends Controller
 
     $currentBalance = Crypt::decryptString($user->balance);
 
-    dd( $currentBalance);
+   // dd( $currentBalance);
 
     $clientPublicKey = file_get_contents(storage_path('keys/client_public_key.pem'));
     $rsaClient = RSA::loadPublicKey($clientPublicKey);
