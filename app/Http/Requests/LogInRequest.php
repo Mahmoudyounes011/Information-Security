@@ -22,7 +22,7 @@ class LogInRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_name' => 'required|string|email|max:255',
+            'phone_num' => ['required','string','regex:/^09\d{8}$/','max:10'],
             'password' => 'required|string|min:4',
         ];
     }

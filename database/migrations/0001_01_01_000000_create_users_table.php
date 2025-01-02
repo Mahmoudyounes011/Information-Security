@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
-            $table->string('user_name')->unique();
+            $table->enum('type_user',['visitor','employee']);
+            $table->string('phone_num',10)->unique();
+            $table->string('car_num',6);
             $table->string('password');
-            $table->text('balance');
-            $table->rememberToken();
             $table->timestamps();
         });
 

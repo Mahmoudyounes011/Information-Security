@@ -14,7 +14,7 @@ class UserRepository extends BaseRepository
 
     public function findByUserName(string $user_name)
     {
-        return $this->model->where('user_name', $user_name)->first();
+        return $this->model->where('phone_num', $user_name)->first();
     }
 
     public function getGroupsByUser($userId)

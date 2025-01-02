@@ -42,38 +42,12 @@ class LoginService
 public function login(LoginRequest $request)
 {
     try {
-
-        $rawPassword = $request->input('password');
-        $userName = $request->input('user_name');
-
-        //here client side 
-        $publicKeyPath = storage_path('app/keys/public_key.pem');
-        $publicKey = file_get_contents($publicKeyPath);
-        if (!$publicKey) {
-            throw new Exception('Missing public key');
+        $credentials = $request->validated();
+        if (!auth()->attempt($credentials)) 
+        {
+            throw new Exception("error in inputs");
         }
-
-        //here server side 
-        $privateKeyPath = storage_path('app/keys/private_key.pem');
-        $privateKey = file_get_contents($privateKeyPath);
-        if (!$privateKey) {
-            throw new Exception('Missing private key');
-        }
-
-        $rsaPublic = RSA::loadPublicKey($publicKey);
-        $encryptedPassword = base64_encode($rsaPublic->encrypt($rawPassword));
-
-        $rsaPrivate = RSA::loadPrivateKey($privateKey);
-        $decryptedPassword = $rsaPrivate->decrypt(base64_decode($encryptedPassword));
-
-        if ($rawPassword !== $decryptedPassword) {
-            throw new Exception('Decryption mismatch');
-        }
-
-        $user = \App\Models\User::where('user_name', $userName)->first();
-        if (!$user || !Hash::check($rawPassword, $user->password)) {
-            throw new Exception(__('Invalid username or password'));
-        }
+        $user = $this->userService->findByUserName($request->phone_num);
 
         return response()->json([
             'user' => $user,

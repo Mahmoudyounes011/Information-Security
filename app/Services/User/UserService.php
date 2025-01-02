@@ -30,11 +30,10 @@ class UserService extends BaseService{
         try{
             
             $data = $request->validated();
-            //here we hash the password in hash we cannot retrive to main string.
 
             
-            $data['password'] = bcrypt($data['password']);
-            $data['balance'] = Crypt::encryptString( $data['balance']); 
+            // $data['password'] = bcrypt($data['password']);
+            // $data['balance'] = Crypt::encryptString( $data['balance']); 
 
             //dd($data['balance']);
             //here we encryptthe password and decrypted so we can after the encrypt to retrive the main value.

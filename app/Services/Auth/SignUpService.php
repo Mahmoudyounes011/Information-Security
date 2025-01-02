@@ -20,13 +20,11 @@ class SignUpService
             $user = $this->userService->createUser($request);
             
             $token = $user->createToken('accessToken')->plainTextToken;
-    
             
             return [
                 'token' => $token,
                 'user' => $user
             ]; 
-    
         } catch (\Exception $e) {
             return [
                 'error' => 'An error occurred while creating the user. Please try again.',

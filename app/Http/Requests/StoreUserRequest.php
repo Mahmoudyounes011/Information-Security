@@ -15,21 +15,12 @@ class StoreUserRequest extends FormRequest
     public function rules()
     {
         return [
-            //'role_id' => 'required|exists:roles,id',
             'first_name' => 'required|string|max:15',
             'last_name' => 'required|string|max:15',
-            'user_name' => 'required|string|email|max:255|unique:users',
+            'type_user' => 'required|string|in:employee,visitor',
             'password' => 'required|string|min:8',
-            'balance' => 'required',
-
-            //'device_token'=>'required|string|max:255',
-            // 'phone_number' => [
-            //     'required',
-            //     'string',
-            //     //'regex:/^09\d{8}$/',
-            //    // 'max:10',
-            //     'unique:users',
-            // ],
+            'car_num' => ['required','regex:/^\d{6}$/'],
+            'phone_num' => ['required','string','regex:/^09\d{8}$/','max:10','unique:users'],
         ];
     }
     
