@@ -3,16 +3,13 @@
 namespace App\Http\Controllers;
 use phpseclib3\Crypt\RSA;
 use App\Http\Requests\BalanceRequest;
-use App\Http\Requests\ImageRequest;
-use App\Http\Requests\SearchReqesut;
-use App\Http\Resources\GroupResource;
+
 use App\Models\User;
-use App\Services\User\UserService;
-use Illuminate\Http\Request;
+
 use App\Traits\ApiResponse;
 use Exception;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+
 use Illuminate\Support\Facades\Crypt;
 
 class UserController extends Controller

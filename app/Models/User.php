@@ -60,4 +60,14 @@ class User extends Authenticatable
     {
         return Crypt::decryptString($value);
     }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function clientKey()
+    {
+        return $this->hasOne(ClientKey::class);
+    }
 }
