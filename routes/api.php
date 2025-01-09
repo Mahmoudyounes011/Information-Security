@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\ParkingSpotController;
 use App\Http\Controllers\ServerKeyController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function ()
     Route::post('/deposit', [UserController::class, 'deposit']);
     Route::post('/withdraw', [UserController::class, 'withdraw']);
     Route::get('/balance', [UserController::class, 'getBalance']);
+    Route::get('/available_parking', [ParkingSpotController::class, 'index']);
 
     Route::post('/handCheck', [ServerKeyController::class, 'getPublicKey']);
 

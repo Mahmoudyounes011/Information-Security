@@ -64,7 +64,7 @@ class UserController extends Controller
     {
         try {
 
-            $amount = $balanceRequest->input('amount');
+            $amount = $balanceRequest->input('balance');
             if (!is_numeric($amount) || $amount <= 0) {
                 return response()->json(['message' => 'Invalid amount'], 400);
             }
