@@ -43,17 +43,28 @@ public function login(LoginRequest $request)
 {
     try {
         $credentials = $request->validated();
+        
+        unset($credentials['session_key']);
+
         if (!auth()->attempt($credentials)) 
         {
             throw new Exception("error in inputs");
         }
         $user = $this->userService->findByUserName($request->phone_num);
 
-        return response()->json([
-            'user' => $user,
-            'token' => $user->createToken('accessToken')->plainTextToken,
+        $sessionKey = $request->session_key;
+    
+        $user->update([
+        'session_key' => $sessionKey,
         ]);
+    
+        return [
+            
+            'token' => $user->createToken('accessToken')->plainTextToken,
+        ];
+        
     } catch (Exception $e) {
+    
         return response()->json(['error' => $e->getMessage()], 400);
     }
 

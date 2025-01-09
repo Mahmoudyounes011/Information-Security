@@ -42,7 +42,9 @@ class AuthController extends Controller
     {
         try
         {
+            
         $data = $loginService->login($request);
+        //dd( $data);
         $message = __('user.login_success');
         return $this->successResponse($data, $message);
         }

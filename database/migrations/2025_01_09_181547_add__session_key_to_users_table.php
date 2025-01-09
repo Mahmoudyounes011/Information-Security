@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->double('balance')->default(0.0);
+            $table->text('session_key')->default('null');
+
         });
     }
 

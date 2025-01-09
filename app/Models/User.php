@@ -25,7 +25,9 @@ class User extends Authenticatable
         'type_user',
         'phone_num',
         'car_num',
-        'password'
+        'password',
+        'balance',
+        'session_key'
     ];
 
     /**
