@@ -14,6 +14,7 @@ class ServerKeyController extends Controller
         ]);
 
         $existingKey = $request->user()->clientKey;
+        
         if ($existingKey) {
             return response()->json(['error' => 'Public key already exists for this user'], 400);
         }

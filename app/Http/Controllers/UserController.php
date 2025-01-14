@@ -1,124 +1,67 @@
 <?php
 
 namespace App\Http\Controllers;
-use phpseclib3\Crypt\RSA;
+
+use App\Helpers\Helper;
 use App\Http\Requests\BalanceRequest;
-
+use Illuminate\Http\Request;
 use App\Models\User;
-
 use App\Traits\ApiResponse;
 use Exception;
 use Illuminate\Support\Facades\Auth;
-
 use Illuminate\Support\Facades\Crypt;
+
 
 class UserController extends Controller
 {
     use ApiResponse;
 
-    public function deposit(BalanceRequest $balanceRequest)
+    private Helper $helper;
+    public  function __construct(Helper $helper) {
+        $this->helper = $helper;
+    }
+
+    
+    public function withdraw(Request $request)
     {
-        try {
+//          $resultKey = $this->helper->encryptRSA("Yn2MaEnHwCNnOHlf\/Dufd7r3su7EWaulucmfONUTT5k=");
+//          $resultIv = $this->helper->encryptRSA("CA1yEW3dSwtc2siHMQrWtQ==");
+//          dd($resultKey ,$resultIv);
 
-            $amount = $balanceRequest->input('amount');
-            if (!is_numeric($amount) || $amount <= 0) {
-                return response()->json(['message' => 'Invalid amount'], 400);
-            }
-    
-        $publicKeyPath = storage_path('app/keys/public_key.pem');
-        $publicKey = file_get_contents($publicKeyPath);
-        if (!$publicKey) {
-            throw new Exception('Missing public key');
-        }
+        //here get encryption key from client
+        $keyI = $request->input('key');
 
-        //here server side 
-        $privateKeyPath = storage_path('app/keys/private_key.pem');
-        $privateKey = file_get_contents($privateKeyPath);
-        if (!$privateKey) {
-            throw new Exception('Missing private key');
-        }
-
-            $rsaPublic = RSA::loadPublicKey($publicKey);
-            $encryptedAmount = base64_encode($rsaPublic->encrypt($amount));
-
-            $rsaPrivate = RSA::loadPrivateKey($privateKey);
-            $decryptedAmount = $rsaPrivate->decrypt(base64_decode($encryptedAmount));
-
-            $user = Auth::user();
-    
-            $userBalance =  $user->balance;
-
-            $oldBalance =User::getBalanceAttribute($userBalance);
-
-            $newBalance = $decryptedAmount + $oldBalance;
+        //here get encryption iv from client
+        $ivI = $request->input('iv');
+        //here get encryption encryptedText from client
+        $encryptedText = $request->input('encryptedText');
         
-            $user->update(['balance' => Crypt::encryptString($newBalance)]);
+        //here decryptRSA for key
+        $key = $this->helper->decryptRSA($keyI);
+        //here decryptRSA for iv
+        $iv = $this->helper->decryptRSA($ivI);
 
-            return response()->json(['encrypted_balance' => $user->update()], 200);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-    }
-    
-    public function withdraw(BalanceRequest $balanceRequest)
-    {
-        try {
-
-            $amount = $balanceRequest->input('balance');
-            if (!is_numeric($amount) || $amount <= 0) {
-                return response()->json(['message' => 'Invalid amount'], 400);
-            }
-    
-            
-            $publicKeyPath = storage_path('app/keys/public_key.pem');
-            $publicKey = file_get_contents($publicKeyPath);
-            if (!$publicKey) {
-                throw new Exception('Missing public key');
-            }
-
-            //here server side 
-            $privateKeyPath = storage_path('app/keys/private_key.pem');
-            $privateKey = file_get_contents($privateKeyPath);
-            if (!$privateKey) {
-                throw new Exception('Missing private key');
-            }
-
-            $rsaPublic = RSA::loadPublicKey($publicKey);
-            $encryptedAmount = base64_encode($rsaPublic->encrypt($amount));
-
-            $rsaPrivate = RSA::loadPrivateKey($privateKey);
-            $decryptedAmount = $rsaPrivate->decrypt(base64_decode($encryptedAmount));
-
-            $user = Auth::user();
-
-            $userBalance =  $user->balance;
-
-            $oldBalance = User::getBalanceAttribute($userBalance);
-            
-            $newBalance = $oldBalance - $decryptedAmount ;
+        //here decrypt encryptedText using decryption (key,iv)
+        $result = $this->helper->decrypt($key,$iv,$encryptedText);
         
-            $f=Crypt::encryptString($newBalance);
-            $user->balance = $f;
-            $user->save();
-    
-            return response()->json(['encrypted_balance' => $user->save()], 200);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+        $amount = $result['decryptedText'];
+        
+        if (!is_numeric($amount) || $amount <= 0) {
+            return response()->json(['message' => 'Invalid amount'], 400);
         }
-    }
-    public function getBalance()
-    {
-        try{
             $user = Auth::user();
 
-            $userBalance =  $user->balance;
+            $userBalance = $user->getRawOriginal('balance');
+            
+            $newBalance =  $userBalance - $amount ;
 
-            $oldBalance = User::getBalanceAttribute($userBalance);
-
-            return response()->json(['encrypted_balance' => $oldBalance ], 200);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        
+        $result =  User::where('id', $user->id)->update([
+                'balance' => $newBalance 
+            ]);
+    
+            return response()->json(['encrypted_balance' => 'success'], 200);
     }
+   
     
 }

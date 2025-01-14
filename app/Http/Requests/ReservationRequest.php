@@ -17,8 +17,8 @@ class ReservationRequest extends FormRequest
     public function rules()
     {
         return [
-            'parking_spot_id' => 'required|exists:parking_spots,id',
-            'reservation_time' => 'required|date',
+            'spot_number' => 'required|text',
+            'reservation_time' => 'required|text',
         ];
     }
 

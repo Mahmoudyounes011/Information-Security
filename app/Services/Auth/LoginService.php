@@ -43,8 +43,8 @@ public function login(LoginRequest $request)
 {
     try {
         $credentials = $request->validated();
-        
-        unset($credentials['session_key']);
+        // dd($credentials);
+        // unset($credentials['session_key']);
 
         if (!auth()->attempt($credentials)) 
         {
@@ -53,9 +53,10 @@ public function login(LoginRequest $request)
         $user = $this->userService->findByUserName($request->phone_num);
 
         $sessionKey = $request->session_key;
-    
+        $iv = $request->iv;
         $user->update([
         'session_key' => $sessionKey,
+        'iv'=>$iv
         ]);
     
         return [

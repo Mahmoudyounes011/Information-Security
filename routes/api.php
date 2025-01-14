@@ -19,7 +19,8 @@ Route::post('/login',[AuthController::class,'login']);
 
 Route::middleware('auth:sanctum')->group(function ()
 {
-    Route::post('/deposit', [UserController::class, 'deposit']);
+  
+    Route::post('/deposit', [UserController::class, 'withdraw']);
     Route::post('/withdraw', [UserController::class, 'withdraw']);
     Route::get('/balance', [UserController::class, 'getBalance']);
     Route::get('/available_parking', [ParkingSpotController::class, 'index']);

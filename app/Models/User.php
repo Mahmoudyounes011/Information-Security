@@ -27,7 +27,8 @@ class User extends Authenticatable
         'car_num',
         'password',
         'balance',
-        'session_key'
+        'session_key',
+        'iv'
     ];
 
     /**
