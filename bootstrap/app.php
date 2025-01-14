@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CheckLangHeader;
+use App\Http\Middleware\PreventEmployeeActions;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;

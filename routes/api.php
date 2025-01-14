@@ -6,6 +6,7 @@ use App\Http\Controllers\ServerKeyController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ReservationController;
+use App\Http\Middleware\PreventEmployeeActions;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Route;
 
@@ -19,7 +20,8 @@ Route::post('/login',[AuthController::class,'login']);
 
 Route::middleware('auth:sanctum')->group(function ()
 {
-  
+    Route::post('/parking-spots', [ParkingSpotController::class, 'store']);
+
     Route::post('/deposit', [UserController::class, 'withdraw']);
     Route::post('/withdraw', [UserController::class, 'withdraw']);
     Route::get('/balance', [UserController::class, 'getBalance']);
@@ -29,6 +31,8 @@ Route::middleware('auth:sanctum')->group(function ()
 
     Route::post('/reservations', [ReservationController::class, 'createReservation']);
 
+    Route::delete('/parking-spots-delete', [ParkingSpotController::class, 'deleteSpot'])->name('parking-spots.destroy');
+    
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
