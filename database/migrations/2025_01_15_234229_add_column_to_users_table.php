@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->double('wallet')->default(10000);
+            $table->decimal('balance', 10, 2)->default(10000);
+
         });
     }
 

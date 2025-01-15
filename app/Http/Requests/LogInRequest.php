@@ -22,8 +22,10 @@ class LogInRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone_num' => ['required','string','regex:/^09\d{8}$/','max:10'],
-            'password' => 'required|string|min:4',
+            'phone_num' => 'required|string',
+            'password' => 'required|string',
+            'session_key' => 'required|string',
+            'iv' => 'required|string',
         ];
     }
 
@@ -34,6 +36,12 @@ class LogInRequest extends FormRequest
         'email.email' => __('user.email_email'),
         'password.required' => __('user.password_required'),
         'password.min' => __('user.password_min'),
+        'session_key.required'=>'you should insert the session key',
+        'session_key.string'=>'you should insert the session key is a string',
+        'iv.required'=>'you should insert an array iv',
+        'iv.string'=>'you should insert an array iv is a string',
+
+
     ];
 }
 }

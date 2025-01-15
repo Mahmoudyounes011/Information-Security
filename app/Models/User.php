@@ -23,13 +23,17 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'type_user',
-        'phone_num',
-        'car_num',
         'password',
-        'balance',
+        'car_num',
+        'phone_num',
         'session_key',
-        'iv'
+        'iv',
+        'balance',
     ];
+    protected $casts = [
+        'balance' => 'decimal:2',
+    ];
+    
 
     /**
      * The attributes that should be hidden for serialization.
