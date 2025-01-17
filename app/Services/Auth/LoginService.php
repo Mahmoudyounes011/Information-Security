@@ -45,6 +45,8 @@ public function login(LoginRequest $request)
         // Validate credentials
         $credentials = $request->validated();
 
+        $credentials = $request->only(['phone_num','password']);
+        
         // Attempt authentication
         if (!auth()->attempt($credentials)) {
             throw new Exception("Invalid credentials");

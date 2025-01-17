@@ -18,7 +18,9 @@ class ReservationController extends Controller
     {
         //auth user for get userInfo
         $userId = $request->user();
+        $inputs = $request->all();
 
+    
         //get the key and iv for decryption
         $key = $userId->session_key;
         $iv = $userId->iv;
@@ -26,20 +28,13 @@ class ReservationController extends Controller
         //get inputs
         $inputs = $request->all();
 
-        //decryption
-        $r =$this->helper->decryptArray($key,$iv, $inputs['encryptedTexts']);
+        $spot_number = $this->helper->decrypt($key,$iv,$inputs['encryptedTexts'][0]);
+        $time = $this->helper->decrypt($key,$iv,$inputs['encryptedTexts'][1]);
 
-        //decode json inputs
-        $data = json_decode($r, true);
-
-        //spot_number
-        $spot_number = $data['decryptedTexts'][0]; 
-        
-        //time for reservation 
-        $time = $data['decryptedTexts'][1]; 
     
         //get object ParkingSpot
         $parkingSpot = ParkingSpot::where('spot_number','=',$spot_number)->first();
+        
         
         //get status of ParkingSpot
         if ($parkingSpot->status !== 'available') {
@@ -50,7 +45,7 @@ class ReservationController extends Controller
         $reservation = Reservation::create([
             'user_id' => $userId->id,
             'parking_spot_id' => $parkingSpot->id,
-            'reservation_time' => $time,
+            'reservation_time' => $time['decryptedText'],
         ]);
 
         //update status 
@@ -58,6 +53,50 @@ class ReservationController extends Controller
 
         return response()->json(['message' => 'Reservation created successfully', 'reservation' => $reservation], 201);
     }
+
+    public function calculateAmount(Request $request)
+    {
+        $request->validate([
+            'spot_number' => 'required|exists:parking_spots,spot_number',
+        ]);
+    
+        $parkingSpot = ParkingSpot::where('spot_number', $request->spot_number)->first();
+    
+        $reservation = Reservation::where('parking_spot_id', $parkingSpot->id)
+            ->where('reservation_time', '>', now())
+            ->first();
+    
+        if (!$reservation) {
+            return response()->json(['message' => 'No active reservation found for this parking spot.'], 404);
+        }
+    
+        $hours = $reservation->created_at->diffInHours($reservation->reservation_time);
+    
+    
+        $amount = $hours * 500;
+    
+        return response()->json([
+            'spot_number' => $parkingSpot->spot_number,
+            'amount' => $amount,
+            'start_time' => $reservation->created_at,
+            'current_time' => $reservation->reservation_time,
+        ]);
+    }
+
+    public function updateExpiredReservations()
+{
+    $expiredReservations = Reservation::where('reservation_time', '<=', now())
+        ->whereHas('parkingSpot', function ($query) {
+            $query->where('status', 'reserved'); 
+        })
+        ->get();
+
+    foreach ($expiredReservations as $reservation) {
+        $reservation->parkingSpot->update(['status' => 'available']);
+    }
+
+    return response()->json(['message' => 'Expired reservations have been updated successfully.']);
+}
 
     
 }
