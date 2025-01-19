@@ -32,11 +32,11 @@ class ReservationController extends Controller
         //get inputs
         $inputs = $request->all();
 
-        $correctSignature = $this -> activityLogService->verifySignature($request->except('signature'),$request->signature);
+        // $correctSignature = $this -> activityLogService->verifySignature($request->except('signature'),$request->signature);
 
-        if(!$correctSignature){
-            return response()->json(['error' => 'Wrong data'], 400);
-        }
+        // if(!$correctSignature){
+        //     return response()->json(['error' => 'Wrong data'], 400);
+        // }
 
         $spot_number = $this->helper->decrypt($key,$iv,$inputs['encryptedTexts'][0]);
         $time = $this->helper->decrypt($key,$iv,$inputs['encryptedTexts'][1]);
@@ -60,7 +60,7 @@ class ReservationController extends Controller
 
         //update status 
         $parkingSpot->update(['status' => 'reserved']);
-        $this -> activityLogService->logReservation($request->signature, $spot_number);
+      //  $this -> activityLogService->logReservation($request->signature, $spot_number);
 
         return response()->json(['message' => 'Reservation created successfully', 'reservation' => $reservation], 201);
     }
