@@ -89,13 +89,13 @@ public  function decryptArray($keyBase64, $ivBase64, $encryptedTextsBase64)
 
 public function encryptRSA($text)
 {
-        $publicKey = DB::table('server_keys')->value('public_key');
+    $publicKey = DB::table('server_keys')->value('public_key');
     if (!$publicKey) {
         throw new \Exception('Public key not found in database');
     }
     
     $rsaPublic = RSA::loadPublicKey($publicKey);
-    
+    dd($rsaPublic);
     return base64_encode($rsaPublic->encrypt($text));
 }
 
@@ -108,7 +108,6 @@ public function decryptRSA($encryptedText)
     
 
     $rsaPrivate = RSA::loadPrivateKey($privateKey);
-
     return $rsaPrivate->decrypt(base64_decode($encryptedText));
 }
 

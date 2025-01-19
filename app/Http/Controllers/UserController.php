@@ -24,10 +24,9 @@ class UserController extends Controller
     
     public function withdraw(Request $request)
     {
-//          $resultKey = $this->helper->encryptRSA("Yn2MaEnHwCNnOHlf\/Dufd7r3su7EWaulucmfONUTT5k=");
+        $resultKey = $this->helper->encryptRSA("Yn2MaEnHwCNnOHlf\/Dufd7r3su7EWaulucmfONUTT5k=");
 //          $resultIv = $this->helper->encryptRSA("CA1yEW3dSwtc2siHMQrWtQ==");
 //          dd($resultKey ,$resultIv);
-
         //here get encryption key from client
         $keyI = $request->input('key');
 
@@ -40,7 +39,7 @@ class UserController extends Controller
         $key = $this->helper->decryptRSA($keyI);
         //here decryptRSA for iv
         $iv = $this->helper->decryptRSA($ivI);
-
+        dd($key,$iv);
         //here decrypt encryptedText using decryption (key,iv)
         $result = $this->helper->decrypt($key,$iv,$encryptedText);
         

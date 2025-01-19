@@ -80,9 +80,15 @@ public function login(LoginRequest $request)
 
         ];
 
+    } catch (\Illuminate\Database\QueryException $e) {
+        
+        if ($e->getCode() === 2002) { 
+            throw new Exception("Database connection error", 500);
+        }
+        throw $e; 
     } catch (Exception $e) {
-        // Handle exceptions and return an error response
-        return response()->json(['error' => $e->getMessage()], 400);
+        
+        throw $e;
     }
 }
 

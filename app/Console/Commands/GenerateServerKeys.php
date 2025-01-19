@@ -27,7 +27,7 @@ class GenerateServerKeys extends Command
      */
     public function handle()
     {
-        $rsa = RSA::createKey(1024); 
+        $rsa = RSA::createKey(256); 
         $privateKey = $rsa->toString('PKCS8');
         $publicKey = $rsa->getPublicKey()->toString('PKCS8'); 
 

@@ -40,17 +40,16 @@ class AuthController extends Controller
 
     public function logIn(LoginRequest $request, LoginService $loginService)
     {
-        try
-        {
-        $data = $loginService->login($request);
-        $message = __('user.login_success');
-        return $this->successResponse($data, $message);
-        }
-        catch (Exception $e) 
-        {
-            return $this->errorResponse($e->getMessage(), 400);
+        try {
+            $data = $loginService->login($request);
+            $message = __('user.login_success');
+            return $this->successResponse($data, $message);
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() === 2002 ? 500 : 400; 
+            return $this->errorResponse($e->getMessage(), $statusCode);
         }
     }
+    
     
     
     public function logout(Request $request)    
