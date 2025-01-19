@@ -60,7 +60,7 @@ class UserController extends Controller
                 'balance' => $newBalance 
             ]);
     
-            return response()->json(['encrypted_balance' => 'success'], 200);
+            return response()->json(['encrypted_balance' => 'success'], 201);
     }
    
     

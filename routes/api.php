@@ -39,6 +39,9 @@ Route::post('/test', [CsrController::class, 'test'])->middleware([ValidateCertif
     Route::post('/handCheck', [ServerKeyController::class, 'getPublicKey']);
 
     Route::post('/reservations', [ReservationController::class, 'createReservation']);
+    Route::post('/reservations/calculate', [ReservationController::class, 'calculateAmount']);
+    Route::post('/reservations/update-expired', [ReservationController::class, 'updateExpiredReservations']);
+    
 
     Route::delete('/parking-spots-delete', [ParkingSpotController::class, 'deleteSpot'])->name('parking-spots.destroy');
     

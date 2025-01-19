@@ -21,6 +21,9 @@ class StoreUserRequest extends FormRequest
             'password' => 'required|string|min:8',
             'car_num' => ['required','regex:/^\d{6}$/'],
             'phone_num' => ['required','string','regex:/^09\d{8}$/','max:10','unique:users'],
+            'session_key' =>'required|string',
+            'iv'=>'required|string',
+        
         ];
     }
     
@@ -40,6 +43,10 @@ class StoreUserRequest extends FormRequest
             'password.min' => __('user.password_min'),
             // 'phone_number.required' => __('user.phone_number_required'),
             // 'phone_number.unique' => __('user.phone_number_unique'),
+            'session_key.required'=>'you should insert the session key',
+            'session_key.string'=>'you should insert the session key is a string   ',
+            'iv.required'=>'you should insert an array iv',
+            'iv.string'=>'you should insert an array iv is a string',
         ];
     }
     

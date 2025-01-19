@@ -45,6 +45,7 @@ class Helper{
         //هذا التابع يقوم بتشفير مصفوفة من المدخلات وارجاع مصفوفة مشفرة 
     public  function encryptArray(array $originalTexts)
     {
+     
 
         $key = openssl_random_pseudo_bytes(32); 
         $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc')); 

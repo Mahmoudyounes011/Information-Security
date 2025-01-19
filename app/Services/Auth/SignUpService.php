@@ -18,12 +18,21 @@ class SignUpService
         try {
             
             $user = $this->userService->createUser($request);
-            
+            //dd($user);
             $token = $user->createToken('accessToken')->plainTextToken;
             
             return [
                 'token' => $token,
-                'user' => $user
+                'user' => [
+                    'id' => $user->id,
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'type_user' => $user->type_user,
+                    'phone_num' => $user->phone_num,
+                    'key'  =>$user->session_key,
+                    'iv' => $user->iv,
+                    'balance' => $user->getRawOriginal('balance')
+                ],
             ]; 
         } catch (\Exception $e) {
             return [
