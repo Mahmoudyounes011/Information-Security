@@ -106,7 +106,6 @@ public function decryptRSA($encryptedText)
         throw new \Exception('Private key not found in database');
     }
     
-
     $rsaPrivate = RSA::loadPrivateKey($privateKey);
     return $rsaPrivate->decrypt(base64_decode($encryptedText));
 }

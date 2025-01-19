@@ -3,16 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Helper;
-use Illuminate\Http\Request;
-use App\Http\Requests\ReservationRequest;
-use App\Models\Reservation;
 use App\Models\ParkingSpot;
+use App\Models\Reservation;
+use Illuminate\Http\Request;
+use App\Services\ActivityLogService;
+use App\Http\Requests\ReservationRequest;
+
 
 class ReservationController extends Controller
 {
     private Helper $helper;
-    public  function __construct(Helper $helper) {
+    private ActivityLogService $activityLogService;
+    public  function __construct(Helper $helper,ActivityLogService $activityLogService) {
         $this->helper = $helper;
+        $this->activityLogService = $activityLogService;
     }
     public function createReservation(Request $request)
     {
@@ -27,6 +31,12 @@ class ReservationController extends Controller
 
         //get inputs
         $inputs = $request->all();
+
+        $correctSignature = $this -> activityLogService->verifySignature($request->except('signature'),$request->signature);
+
+        if(!$correctSignature){
+            return response()->json(['error' => 'Wrong data'], 400);
+        }
 
         $spot_number = $this->helper->decrypt($key,$iv,$inputs['encryptedTexts'][0]);
         $time = $this->helper->decrypt($key,$iv,$inputs['encryptedTexts'][1]);
@@ -50,6 +60,7 @@ class ReservationController extends Controller
 
         //update status 
         $parkingSpot->update(['status' => 'reserved']);
+        $this -> activityLogService->logReservation($request->signature, $spot_number);
 
         return response()->json(['message' => 'Reservation created successfully', 'reservation' => $reservation], 201);
     }
@@ -97,6 +108,4 @@ class ReservationController extends Controller
 
     return response()->json(['message' => 'Expired reservations have been updated successfully.']);
 }
-
-    
 }
